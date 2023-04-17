@@ -61,7 +61,32 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-module.exports.updateMyInfo = (req, res) => {
+module.exports.updateAvatar = (req, res) => {
+  const {
+    avatar
+  } = req.body;
+  User.findByIdAndUpdate(req.user._id, {
+      avatar
+    }, {
+      new: true,
+      runValidators: true
+    })
+    .then((user) => {
+      if (user) res.send({
+        data: user
+      });
+      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
+    })
+    .catch((err) => {
+      if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
+        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      } else {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
+      }
+    });
+};
+
+module.exports.updateInfo = (req, res) => {
   const {
     name,
     about
@@ -88,27 +113,3 @@ module.exports.updateMyInfo = (req, res) => {
     });
 };
 
-module.exports.updateMyAvatar = (req, res) => {
-  const {
-    avatar
-  } = req.body;
-  User.findByIdAndUpdate(req.user._id, {
-      avatar
-    }, {
-      new: true,
-      runValidators: true
-    })
-    .then((user) => {
-      if (user) res.send({
-        data: user
-      });
-      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
-    })
-    .catch((err) => {
-      if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
-        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
-      }
-    });
-};

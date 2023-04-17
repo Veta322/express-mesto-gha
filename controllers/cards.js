@@ -44,7 +44,7 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.deleteCardById = (req, res) => {
+module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card) res.send({
@@ -61,7 +61,7 @@ module.exports.deleteCardById = (req, res) => {
     });
 };
 
-module.exports.putLike = (req, res) => {
+module.exports.like = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, {
       $addToSet: {
         likes: req.user._id
@@ -85,7 +85,7 @@ module.exports.putLike = (req, res) => {
     });
 };
 
-module.exports.deleteLike = (req, res) => {
+module.exports.unLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, {
       $pull: {
         likes: req.user._id
