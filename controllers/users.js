@@ -1,86 +1,80 @@
 const User = require('../models/user');
+const {
+  STATUS_BAD_REQUEST,
+  STATUS_NOT_FOUND,
+  STATUS_INTERNAL_SERVER_ERROR,
+  STATUS_BAD_REQUEST_MESSAGE,
+  STATUS_NOT_FOUND_MESSAGE,
+  STATUS_INTERNAL_SERVER_ERROR_MESSAGE,
+} = require('../utils/constants');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      res.status(500).send({ message: err });
-    });
+    .then((users) => {
+      res.send({ data: users });
+    })
+    .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR)
+      .send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE));
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (user) res.send({ data: user });
+      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
-        return;
+        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      } else {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
       }
-      res.status(500).send({ message: 'Что-то пошло не так...' });
     });
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-        return;
-      }
-      res.status(500).send({ message: 'Что-то пошло не так...' });
-    });
-};
-
-module.exports.patchUser = (req, res) => {
-  const { name, about } = req.body;
-  const data = {};
-  if (name !== undefined) {
-    data.name = name;
-  }
-  if (about !== undefined) {
-    data.about = about;
-  }
-  User.findByIdAndUpdate(
-    req.user._id,
-    data,
-    { new: true },
-  )
     .then((user) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError' && err.path === '_id') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-        return;
+      if (err.name === 'ValidationError') {
+        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      } else {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
       }
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-        return;
-      }
-      res.status(500).send({ message: 'Что-то пошло не так...' });
     });
 };
 
-module.exports.patchAvatar = (req, res) => {
-  const { link } = req.body;
-
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar: link },
-    { new: true },
-  )
-    .then((user) => res.send({ data: user }))
+module.exports.updateMyInfo = (req, res) => {
+  const { name, about } = req.body;
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .then((user) => {
+      if (user) res.send({ data: user });
+      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
+    })
     .catch((err) => {
-      if (err.name === 'CastError' && err.path === '_id') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-        return;
+      if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
+        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      } else {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
       }
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
-        return;
+    });
+};
+
+module.exports.updateMyAvatar = (req, res) => {
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+    .then((user) => {
+      if (user) res.send({ data: user });
+      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
+    })
+    .catch((err) => {
+      if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
+        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      } else {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
       }
-      res.status(500).send({ message: 'Что-то пошло не так...' });
     });
 };
