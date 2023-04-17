@@ -2,10 +2,15 @@ const STATUS_BAD_REQUEST = 400;
 const STATUS_NOT_FOUND = 404;
 const STATUS_INTERNAL_SERVER_ERROR = 500;
 
-
-const STATUS_NOT_FOUND_MESSAGE = { message: 'Неверный id' };
-const STATUS_BAD_REQUEST_MESSAGE = { message: 'Некорректные данные' };
-const STATUS_INTERNAL_SERVER_ERROR_MESSAGE = { message: 'Ошибка на сервере' };
+const STATUS_NOT_FOUND_MESSAGE = {
+  message: 'Неверный id'
+};
+const STATUS_BAD_REQUEST_MESSAGE = {
+  message: 'Некорректные данные'
+};
+const STATUS_INTERNAL_SERVER_ERROR_MESSAGE = {
+  message: 'Ошибка на сервере'
+};
 
 module.exports = {
   STATUS_BAD_REQUEST,
