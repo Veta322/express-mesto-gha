@@ -10,95 +10,90 @@ const {
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .populate(['owner', 'likes'])
     .then((cards) => {
-      res.send({
-        data: cards,
-      });
+      if (!cards) {
+        return res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
+      }
+      return res.send(cards);
     })
     .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR)
       .send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE));
 };
 
 module.exports.createCard = (req, res) => {
-  const {
-    name,
-    link,
-  } = req.body;
-  Card.create({
-    name,
-    link,
-    owner: req.user._id,
-  })
-    .then((card) => {
-      res.send({
-        data: card,
-      });
+  const { _id } = req.user;
+  const { name, link } = req.body;
+
+  Card.create({ name, link, owner: _id })
+    .then((newCard) => {
+      res.send(newCard);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        return res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
       }
+      return res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
     });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
-      if (card) res.send({ data: card });
-      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
+      if (!card) {
+        return res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
       }
+      return res.send(card);
+    })
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        return res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      }
+      return res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
     });
 };
 
 module.exports.like = (req, res) => {
-  Card.findByIdAndUpdate(req.params.cardId, {
-    $addToSet: {
-      likes: req.user._id,
-    },
-  }, {
-    new: true,
-  })
-    .populate(['owner', 'likes'])
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } }, // добавим _id в массив, если его там нет
+    { new: true },
+  )
     .then((card) => {
-      if (card) res.send({ data: card });
-      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
+      if (!card) {
+        return res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
       }
+      return res.send(card);
+    })
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        return res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      }
+      if (error.name === 'CastError') {
+        return res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      }
+      return res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
     });
 };
 
 module.exports.unLike = (req, res) => {
-  Card.findByIdAndUpdate(req.params.cardId, {
-    $pull: {
-      likes: req.user._id,
-    },
-  }, {
-    new: true,
-  })
-    .populate(['owner', 'likes'])
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } }, // уберем _id из массива
+    { new: true },
+  )
     .then((card) => {
-      if (card) res.send({ data: card });
-      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
+      if (!card) {
+        return res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
       }
+      return res.send(card);
+    })
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        return res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      }
+      if (error.name === 'CastError') {
+        return res.status(STATUS_BAD_REQUEST).send(STATUS_BAD_REQUEST_MESSAGE);
+      }
+      return res.status(STATUS_INTERNAL_SERVER_ERROR).send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE);
     });
 };

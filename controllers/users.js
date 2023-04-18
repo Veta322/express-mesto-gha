@@ -11,10 +11,9 @@ const {
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => {
-      if (!users) {
-        return res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
-      }
-      return res.send(users);
+      res.send({
+        data: users,
+      });
     })
     .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR)
       .send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE));
@@ -23,10 +22,8 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
-      if (!user) {
-        return res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
-      }
-      return res.send(user);
+      if (user) res.send({ data: user });
+      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -49,7 +46,9 @@ module.exports.createUser = (req, res) => {
     avatar,
   })
     .then((user) => {
-      res.send(user);
+      res.send({
+        data: user,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -71,10 +70,8 @@ module.exports.updateAvatar = (req, res) => {
     runValidators: true,
   })
     .then((user) => {
-      if (!user) {
-        return res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
-      }
-      return res.send(user);
+      if (user) res.send({ data: user });
+      else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
     })
     .catch((err) => {
       if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
