@@ -12,7 +12,7 @@ module.exports.getCards = (req, res) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => {
-      res.status(200).send({
+      res.send({
         data: cards,
       });
     })
@@ -31,7 +31,7 @@ module.exports.createCard = (req, res) => {
     owner: req.user._id,
   })
     .then((card) => {
-      res.status(200).send({
+      res.send({
         data: card,
       });
     })

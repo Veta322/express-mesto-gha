@@ -11,9 +11,7 @@ const {
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => {
-      res.send({
-        data: users,
-      });
+      res.send(users);
     })
     .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR)
       .send(STATUS_INTERNAL_SERVER_ERROR_MESSAGE));
@@ -46,9 +44,7 @@ module.exports.createUser = (req, res) => {
     avatar,
   })
     .then((user) => {
-      res.send({
-        data: user,
-      });
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
