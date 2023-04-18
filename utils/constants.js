@@ -3,7 +3,7 @@ const STATUS_NOT_FOUND = 404;
 const STATUS_INTERNAL_SERVER_ERROR = 500;
 
 const STATUS_NOT_FOUND_MESSAGE = {
-  message: 'Неверный id'
+  message: 'Страница не найдена'
 };
 const STATUS_BAD_REQUEST_MESSAGE = {
   message: 'Некорректные данные'
