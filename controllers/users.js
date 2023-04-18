@@ -12,7 +12,7 @@ module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => {
       res.send({
-        data: users
+        data: users,
       });
     })
     .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR)
@@ -22,9 +22,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
-      if (user) res.send({
-        data: user
-      });
+      if (user) res.send({ data: user });
       else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
     })
     .catch((err) => {
@@ -40,16 +38,16 @@ module.exports.createUser = (req, res) => {
   const {
     name,
     about,
-    avatar
+    avatar,
   } = req.body;
   User.create({
-      name,
-      about,
-      avatar
-    })
+    name,
+    about,
+    avatar,
+  })
     .then((user) => {
       res.send({
-        data: user
+        data: user,
       });
     })
     .catch((err) => {
@@ -63,18 +61,16 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateAvatar = (req, res) => {
   const {
-    avatar
+    avatar,
   } = req.body;
   User.findByIdAndUpdate(req.user._id, {
-      avatar
-    }, {
-      new: true,
-      runValidators: true
-    })
+    avatar,
+  }, {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => {
-      if (user) res.send({
-        data: user
-      });
+      if (user) res.send({ data: user });
       else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
     })
     .catch((err) => {
@@ -89,19 +85,17 @@ module.exports.updateAvatar = (req, res) => {
 module.exports.updateInfo = (req, res) => {
   const {
     name,
-    about
+    about,
   } = req.body;
   User.findByIdAndUpdate(req.user._id, {
-      name,
-      about
-    }, {
-      new: true,
-      runValidators: true
-    })
+    name,
+    about,
+  }, {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => {
-      if (user) res.send({
-        data: user
-      });
+      if (user) res.send({ data: user });
       else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
     })
     .catch((err) => {
@@ -112,4 +106,3 @@ module.exports.updateInfo = (req, res) => {
       }
     });
 };
-

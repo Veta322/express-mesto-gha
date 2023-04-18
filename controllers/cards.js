@@ -13,7 +13,7 @@ module.exports.getCards = (req, res) => {
     .populate(['owner', 'likes'])
     .then((cards) => {
       res.send({
-        data: cards
+        data: cards,
       });
     })
     .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR)
@@ -23,16 +23,16 @@ module.exports.getCards = (req, res) => {
 module.exports.createCard = (req, res) => {
   const {
     name,
-    link
+    link,
   } = req.body;
   Card.create({
-      name,
-      link,
-      owner: req.user._id
-    })
+    name,
+    link,
+    owner: req.user._id,
+  })
     .then((card) => {
       res.send({
-        data: card
+        data: card,
       });
     })
     .catch((err) => {
@@ -47,9 +47,7 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
-      if (card) res.send({
-        data: card
-      });
+      if (card) res.send({ data: card });
       else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
     })
     .catch((err) => {
@@ -63,17 +61,15 @@ module.exports.deleteCard = (req, res) => {
 
 module.exports.like = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, {
-      $addToSet: {
-        likes: req.user._id
-      }
-    }, {
-      new: true
-    })
+    $addToSet: {
+      likes: req.user._id,
+    },
+  }, {
+    new: true,
+  })
     .populate(['owner', 'likes'])
     .then((card) => {
-      if (card) res.send({
-        data: card
-      });
+      if (card) res.send({ data: card });
       else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
     })
     .catch((err) => {
@@ -87,17 +83,15 @@ module.exports.like = (req, res) => {
 
 module.exports.unLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, {
-      $pull: {
-        likes: req.user._id
-      }
-    }, {
-      new: true
-    })
+    $pull: {
+      likes: req.user._id,
+    },
+  }, {
+    new: true,
+  })
     .populate(['owner', 'likes'])
     .then((card) => {
-      if (card) res.send({
-        data: card
-      });
+      if (card) res.send({ data: card });
       else res.status(STATUS_NOT_FOUND).send(STATUS_NOT_FOUND_MESSAGE);
     })
     .catch((err) => {
