@@ -1,5 +1,3 @@
-const unauthorizedUser = 'Авторизация не пройдена =(';
-
 class UnauthorizedError extends Error {
   constructor(message) {
     super(message);
@@ -7,4 +5,4 @@ class UnauthorizedError extends Error {
   }
 }
 
-module.exports = { UnauthorizedError, unauthorizedUser };
+module.exports = UnauthorizedError;

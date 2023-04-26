@@ -1,134 +1,122 @@
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const {
-  STATUS_OK,
-  STATUS_CREATED,
-} = require('../utils/constants');
-const { BadRequestError, badRequestMessage } = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
-const { NotFoundError, notFoundUser } = require('../errors/NotFoundError');
 
-module.exports.getUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => {
-      res.status(STATUS_OK).send({ data: users });
-    })
-    .catch(next);
+const getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({});
+
+    res.send(users);
+  } catch (err) {
+    next(err);
+  }
 };
 
-module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
-    .then((data) => {
-      if (data === null) {
-        throw new NotFoundError(notFoundUser);
-      } else {
-        res.status(STATUS_OK).send({ data });
-      }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError(
-          badRequestMessage,
-        ));
-      } else {
-        next(err);
-      }
+const getUserById = async (req, res, next) => {
+  try {
+    let action;
+
+    if (req.path === '/me') {
+      action = req.user._id;
+    } else {
+      action = req.params.id;
+    }
+
+    const user = await User.findById(action);
+
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден =( ');
+    }
+
+    res.send(user);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      next(new BadRequestError('Переданы некорректные данные.'));
+    } else {
+      next(err);
+    }
+  }
+};
+
+const createUser = async (req, res, next) => {
+  try {
+    const {
+      name, about, avatar, email, password,
+    } = req.body;
+    const hash = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name, about, avatar, email, password: hash,
     });
-};
 
-module.exports.createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-
-  bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        name, about, avatar, email, password: hash,
-      })
-        .then((user) => {
-          const { _id } = user;
-          res.status(STATUS_CREATED).send({
-            _id, email, name, about, avatar,
-          });
-        })
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            next(new BadRequestError(
-              badRequestMessage,
-            ));
-          } else if (err.code === 11000) {
-            next(new ConflictError(
-              'Пользователь с таким email уже существует',
-            ));
-          } else {
-            next(err);
-          }
-        });
+    res.status(201).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
     });
+  } catch (err) {
+    if (err.code === 11000) {
+      next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+    } else if (err.name === 'ValidationError') {
+      next(new BadRequestError('Некорректные данные'));
+    } else {
+      next(err);
+    }
+  }
 };
 
-module.exports.updateAvatar = (req, res, next) => {
-  const userId = req.user._id;
-  const { avatar } = req.body;
-  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .then((data) => {
-      if (data === null) {
-        throw new NotFoundError(notFoundUser);
-      } else {
-        res.status(STATUS_OK).send({ data });
-      }
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError(
-          badRequestMessage,
-        ));
-      } else {
-        next(err);
-      }
-    });
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findUserByCredentials(email, password);
+    const token = jwt.sign({ _id: user._id }, 'very-very-very-secret-key', { expiresIn: '7d' });
+
+    res.send({ token });
+  } catch (err) {
+    next(err);
+  }
 };
 
-module.exports.updateInfo = (req, res, next) => {
-  const userId = req.user._id;
-  const { name, about } = req.body;
+const editProfile = async (req, res, next) => {
+  try {
+    const action = {};
 
-  User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .then((data) => {
-      if (data === null) {
-        throw new NotFoundError(notFoundUser);
-      } else {
-        res.status(STATUS_OK).send({ data });
-      }
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError(
-          badRequestMessage,
-        ));
-      } else {
-        next(err);
-      }
-    });
+    if (req.path === '/me/avatar') {
+      action.avatar = req.body.avatar;
+    } else {
+      action.name = req.body.name;
+      action.about = req.body.about;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      action,
+      { new: true, runValidators: true },
+    );
+
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден =( ');
+    }
+
+    res.send(user);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      next(new BadRequestError(
+        'Некорректные данные',
+      ));
+    } else {
+      next(err);
+    }
+  }
 };
 
-module.exports.getInfo = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => {
-      res.send({ user });
-    })
-    .catch(next);
-};
-
-module.exports.login = (req, res, next) => {
-  const { password, email } = req.body;
-
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'very-very-very-secret-key', { expiresIn: '7d' });
-      res.send({ token });
-    })
-    .catch(next);
+module.exports = {
+  createUser,
+  getUsers,
+  getUserById,
+  editProfile,
+  login,
 };

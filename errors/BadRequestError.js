@@ -1,5 +1,3 @@
-const badRequestMessage = 'Некорректные данные =(';
-
 class BadRequestError extends Error {
   constructor(message) {
     super(message);
@@ -7,4 +5,4 @@ class BadRequestError extends Error {
   }
 }
 
-module.exports = { BadRequestError, badRequestMessage };
+module.exports = BadRequestError;

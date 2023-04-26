@@ -1,6 +1,3 @@
-const notFoundCard = 'Карточка не найдена =( ';
-const notFoundUser = 'Пользователь не найден =( ';
-
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
@@ -8,4 +5,4 @@ class NotFoundError extends Error {
   }
 }
 
-module.exports = { NotFoundError, notFoundCard, notFoundUser };
+module.exports = NotFoundError;
