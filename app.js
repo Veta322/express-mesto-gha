@@ -30,7 +30,7 @@ app.use('*', (req, res) => {
   });
 });
 app.use(errors());
-
+app.use(handleError);
 
 app.listen(PORT, () => {
   console.log(`Приложение, прослушивающее порт: ${PORT}`);
