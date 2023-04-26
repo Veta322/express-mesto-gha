@@ -12,7 +12,7 @@ const {
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
-router.get('/:userId', validationUserId, getUserById);
+router.get('/:userId',  getUserById);
 router.patch('/me', validationUserInfo, updateProfile);
 router.patch('me/avatar', validationAvatar, updateAvatar);
 
