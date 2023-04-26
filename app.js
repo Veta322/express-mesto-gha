@@ -6,7 +6,7 @@ const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const handleError = require('./middlewares/handleError');
 const auth = require('./middlewares/auth');
-const { validationLogin, validationCreateUser } = require('./middlewares/validation');
+const { validateLogin, validateRegister } = require('./middlewares/validation');
 
 
 const { PORT = 3000 } = process.env;
@@ -17,8 +17,8 @@ app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.post('/signin', validationLogin, login);
-app.post('/signup', validationCreateUser, createUser);
+app.post('/signin', validateLogin, login);
+app.post('/signup', validateRegister, createUser);
 
 app.use(auth);
 
@@ -30,7 +30,7 @@ app.use('*', (req, res) => {
   });
 });
 app.use(errors());
-app.use(handleError);
+
 
 app.listen(PORT, () => {
   console.log(`Приложение, прослушивающее порт: ${PORT}`);
