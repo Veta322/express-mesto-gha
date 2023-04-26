@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const {
-  STATUS_NOT_FOUND,
-} = require('./utils/constants');
+const { errors } = require('celebrate');
+const router = require('./routes/routes');
 
 const {
   PORT = 3000,
@@ -13,23 +12,14 @@ app.use(express.json());
 app.use(express.urlencoded({
   extended: true,
 }));
-
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '643d59b0234dedaf5cd9c46a',
-  };
+app.use(router);
+app.use(errors());
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  const errorMessage = statusCode === 500 ? 'На сервере произошла ошибка' : message;
+  res.status(statusCode).send({ message: errorMessage });
   next();
 });
-
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
-
-app.use((req, res) => {
-  res.status(STATUS_NOT_FOUND).send({
-    message: 'Такой страницы не существует :(',
-  });
-});
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb', { useNewUrlParser: true });
 
 app.listen(PORT, () => {});
