@@ -6,19 +6,19 @@ const Unauthorized = require('../utils/errors/Unauthorized');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    default: 'Жак-Ив Кусто',
-    minlength: [2, 'минимальная длина поля "name" - 2'],
-    maxlength: [30, 'максимальная длина поля "name" - 30'],
+    default: 'Валерочка',
+    minlength: 2,
+    maxlength: 30,
   },
   about: {
     type: String,
-    default: 'Исследователь',
-    minlength: [2, 'минимальная длина поля "about" - 2'],
-    maxlength: [30, 'максимальная длина поля "about" - 30'],
+    default: 'Исследователь гаража',
+    minlength: 2,
+    maxlength: 30,
   },
   avatar: {
     type: String,
-    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    default: 'https://d7-invdn-com.investing.com/company_logo/ece7f24263c337cd82511463b9ec5b4d.jpg',
     validate: {
       validator: (v) => validator.isURL(v),
       message: 'Неправильный формат ссылки',

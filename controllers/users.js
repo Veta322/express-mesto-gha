@@ -1,28 +1,27 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { OK, CREATED } = require('../utils/http2Constants');
-const BadRequest = require('../utils/errors/BadRequest'); // 400
-const NotFound = require('../utils/errors/NotFound'); // 404
-const Conflict = require('../utils/errors/Conflict'); // 409
+const BadRequest = require('../utils/errors/BadRequest');
+const NotFound = require('../utils/errors/NotFound');
+const Conflict = require('../utils/errors/Conflict');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(OK).send(users))
+    .then((users) => res.status(200).send(users))
     .catch((err) => next(err));
 };
 
-module.exports.getUserId = (req, res, next) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (user === null) {
-        throw new NotFound('Пользователь по указанному _id не найден.');
+        throw new NotFound('Пользователь с данным _id не найден :(');
       }
-      return res.status(OK).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('Неверный формат данных в запросе'));
+        next(new BadRequest('Переданы некорректные данные :('));
       } else {
         next(err);
       }
@@ -48,13 +47,13 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       const userObject = user.toObject();
       delete userObject.password;
-      res.status(CREATED).send({ user: userObject });
+      res.status(201).send({ user: userObject });
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new Conflict('Такой адрес электронной почты уже зарегистрирован'));
+        next(new Conflict('Пользователь с таким email уже зарегистрирован :('));
       } else if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
+        next(new BadRequest('Некорректные данные при создании пользователя :('));
       } else {
         next(err);
       }
@@ -73,13 +72,13 @@ module.exports.updateProfile = (req, res, next) => {
   )
     .then((user) => {
       if (user === null) {
-        throw new NotFound('Пользователь с указанным _id не найден.');
+        throw new NotFound('Пользователь с данным _id не найден :(');
       }
-      return res.status(OK).send({ name: user.name, about: user.about });
+      return res.status(200).send({ name: user.name, about: user.about });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
+        next(new BadRequest('Некорректные данные при обновлении профиля :('));
       } else {
         next(err);
       }
@@ -97,11 +96,11 @@ module.exports.updateAvatar = (req, res, next) => {
       if (user === null) {
         throw new NotFound('Пользователь с указанным _id не найден.');
       }
-      return res.status(OK).send({ avatar: user.avatar });
+      return res.status(200).send({ avatar: user.avatar });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные при обновлении аватара.'));
+        next(new BadRequest('Некорректные данные при обновлении аватара :('));
       } else {
         next(err);
       }
@@ -112,7 +111,7 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, 'very-very-very-secret-key', { expiresIn: '7d' });
       res.send({ _id: token });
     })
     .catch((err) => next(err));
@@ -122,9 +121,9 @@ module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFound('пользователь не найден');
+        throw new NotFound('Пользователь не найден');
       }
-      return res.status(OK).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => next(err));
 };
