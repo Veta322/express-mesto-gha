@@ -24,6 +24,7 @@ app.use(auth);
 
 app.use('/cards', cardsRouter);
 app.use('/users', usersRouter);
+
 app.use('*', (req, res) => {
   res.status(404).send({
     message: 'Запрашиваемый адрес не найден.',

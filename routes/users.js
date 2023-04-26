@@ -9,11 +9,12 @@ const {
 const {
   validationUserId, validationUserInfo, validationAvatar
 } = require('../middlewares/validation');
+const auth = require('../middlewares/auth');
 
-usersRouter.get('/', getUsers);
-usersRouter.get('/me', getCurrentUser);
-usersRouter.get('/users/:userId', validationUserId, getUserById);
-usersRouter.patch('/users/me', validationUserInfo, updateProfile);
-usersRouter.patch('/users/me/avatar', validationAvatar, updateAvatar);
+usersRouter.get('/users', auth, getUsers);
+usersRouter.get('/users/me', auth, getCurrentUser);
+usersRouter.get('/users/:userId', auth, validationUserId, getUserById);
+usersRouter.patch('/users/me', auth, validationUserInfo, updateProfile);
+usersRouter.patch('/users/me/avatar', auth, validationAvatar, updateAvatar);
 
 module.exports = usersRouter;

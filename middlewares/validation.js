@@ -1,6 +1,6 @@
 const { Joi, celebrate } = require('celebrate');
 
-const URL_REGEXP = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+const pattern = /^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*$/;
 
 module.exports.validationCardId = celebrate({
   params: Joi.object().keys({
@@ -11,7 +11,7 @@ module.exports.validationCardId = celebrate({
 module.exports.validationCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(URL_REGEXP),
+    link: Joi.string().required().pattern(pattern),
   }),
 });
 
@@ -28,7 +28,7 @@ module.exports.validationCreateUser = celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(URL_REGEXP),
+    avatar: Joi.string().pattern(pattern),
   }),
 });
 
@@ -47,6 +47,6 @@ module.exports.validationUserInfo = celebrate({
 
 module.exports.validationAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(URL_REGEXP),
+    avatar: Joi.string().pattern(pattern),
   }),
 });
