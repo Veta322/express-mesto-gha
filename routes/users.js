@@ -9,7 +9,6 @@ const {
 const {
   validationUserId, validationUserInfo, validationAvatar
 } = require('../middlewares/validation');
-const auth = require('../middlewares/auth');
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);

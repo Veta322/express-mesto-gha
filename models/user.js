@@ -6,19 +6,19 @@ const Unauthorized = require('../utils/errors/Unauthorized');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    default: 'Валерочка',
+    default: 'Жак-Ив Кусто',
     minlength: 2,
     maxlength: 30,
   },
   about: {
     type: String,
-    default: 'Исследователь гаража',
+    default: 'Исследователь',
     minlength: 2,
     maxlength: 30,
   },
   avatar: {
     type: String,
-    default: 'https://d7-invdn-com.investing.com/company_logo/ece7f24263c337cd82511463b9ec5b4d.jpg',
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator: (v) => validator.isURL(v),
       message: 'Неправильный формат ссылки',
