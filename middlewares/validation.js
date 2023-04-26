@@ -4,7 +4,7 @@ const pattern = /^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*$/;
 
 module.exports.validationCardId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().hex().length(24),
+    cardId: Joi.string().hex().required().length(24),
   }),
 });
 
