@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'some-secret-key');
+    payload = jwt.verify(token, 'very-very-very-secret-key');
   } catch (err) {
     return next(new Unauthorized('Необходима авторизация'));
   }
