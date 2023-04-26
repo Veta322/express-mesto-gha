@@ -6,12 +6,12 @@ const {
   like,
   unLike,
 } = require('../controllers/cards');
-const { validateCard, validateCardId } = require('../middlewares/validation');
+const { checkNewCard, checkCardId, } = require('../middlewares/validation');
 
 cardsRouter.get('/', getCards);
-cardsRouter.post('/', validateCard, createCard);
-cardsRouter.delete('/:cardId', validateCardId, deleteCard);
-cardsRouter.put('/:cardId/likes', validateCardId, like);
-cardsRouter.delete('/:cardId/likes', validateCardId, unLike);
+cardsRouter.post('/', checkNewCard, createCard);
+cardsRouter.delete('/:cardId', checkCardId, deleteCard);
+cardsRouter.put('/:cardId/likes', checkCardId, like);
+cardsRouter.delete('/:cardId/likes', checkCardId, unLike);
 
 module.exports = cardsRouter;

@@ -1,51 +1,55 @@
 const { celebrate, Joi } = require('celebrate');
+
 const pattern = /^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*$/;
 
-module.exports.validateLogin = celebrate({
+const checkReg = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().email().required(),
+    email: Joi.string().required().email(),
     password: Joi.string().required(),
-  }),
-});
-
-module.exports.validateRegister = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(pattern),
-    email: Joi.string().email().required(),
+    name: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(pattern),
+  }),
+});
+
+const checkLogin = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
 });
 
-module.exports.validateProfile = celebrate({
+const checkUserData = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    about: Joi.string().min(2).max(30).required(),
+    about: Joi.string().min(2).max(30),
+    name: Joi.string().min(2).max(30),
+  }),
+});
+const checkUserAvatar = celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().pattern(pattern),
   }),
 });
 
-module.exports.validateAvarar = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().regex(pattern).required(),
-  }),
-});
-
-module.exports.validateUserId = celebrate({
+const checkUserId = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().hex().length(24).required(),
+    userId: Joi.string().required().regex(/^[0-9a-fA-F]{24}$/),
   }),
 });
 
-module.exports.validateCard = celebrate({
+const checkNewCard = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().regex(pattern).required(),
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(pattern),
   }),
 });
 
-module.exports.validateCardId = celebrate({
+const checkCardId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24).required(),
+    cardId: Joi.string().hex(),
   }),
 });
+
+module.exports = {
+  checkLogin, checkReg, checkUserId, checkNewCard, checkCardId, checkUserData, checkUserAvatar,
+};
