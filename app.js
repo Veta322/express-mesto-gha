@@ -1,8 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
-const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const handleError = require('./middlewares/handleError');
 const auth = require('./middlewares/auth');
@@ -22,8 +20,8 @@ app.post('/signup', validationCreateUser, createUser);
 
 app.use(auth);
 
-app.use('/cards', cardsRouter);
-app.use('/users', usersRouter);
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
 
 app.use('*', (req, res) => {
   res.status(404).send({
