@@ -5,8 +5,6 @@ const { login, createUser } = require('./controllers/users');
 const handleError = require('./middlewares/handleError');
 const auth = require('./middlewares/auth');
 const { validationLogin, validationCreateUser  } = require('./middlewares/validation');
-const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
 
 const { PORT = 3000 } = process.env;
 const app = express();
