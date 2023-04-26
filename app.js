@@ -5,7 +5,8 @@ const { login, createUser } = require('./controllers/users');
 const handleError = require('./middlewares/handleError');
 const auth = require('./middlewares/auth');
 const { validationLogin, validationCreateUser  } = require('./middlewares/validation');
-
+const usersRouter = require('./routes/users');
+const cardsRouter = require('./routes/cards');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -20,8 +21,8 @@ app.post('/signup', validationCreateUser, createUser);
 
 app.use(auth);
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.use('/cards', cardsRouter);
+app.use('/users', usersRouter);
 
 app.use('*', (req, res) => {
   res.status(404).send({
