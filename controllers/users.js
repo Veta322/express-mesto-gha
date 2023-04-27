@@ -112,7 +112,7 @@ module.exports.login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'very-very-very-secret-key', { expiresIn: '7d' });
-      res.send({ _id: token });
+      res.send({ token });
     })
     .catch((err) => next(err));
 };

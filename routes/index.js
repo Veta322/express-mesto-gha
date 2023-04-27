@@ -14,7 +14,7 @@ routes.use(auth);
 routes.use('/users', require('./users'));
 routes.use('/cards', require('./cards'));
 
-routes.all('*', (req, res, next) => { next(new NotFound('Несуществующий маршрут.')); });
+routes.all('*', (req, res, next) => { next(new NotFound('Запрашиваемый адрес не найден :( ')); });
 
 routes.use(errors());
 
