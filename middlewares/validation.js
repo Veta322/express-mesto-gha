@@ -39,14 +39,14 @@ module.exports.validationUserId = celebrate({
 });
 
 module.exports.validationUserInfo = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+  body: Joi.object().required().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
   }),
 });
 
 module.exports.validationAvatar = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().pattern(pattern),
+  body: Joi.object().required().keys({
+    avatar: Joi.string().required().pattern(pattern),
   }),
 });
